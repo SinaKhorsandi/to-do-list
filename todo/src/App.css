@@ -1,0 +1,129 @@
+
+@font-face {
+  font-family: 'IRANSansWeb';
+  src: url('fonts/IRANSansWeb\(FaNum\).eot') format('eot'),
+   url('fonts/IRANSansWeb\(FaNum\).woff') format('woff'), 
+   url('fonts/IRANSansWeb\(FaNum\).ttf') format('ttf');
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'IRANSansWeb';
+
+}
+
+body {
+  font-family: 'IRANSansWeb';
+  font-weight: bold;
+    background: linear-gradient(110deg, #020a0f, #051b25);
+    direction: rtl;
+
+}
+.todo-app {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  width: 70%;
+  min-height: 400px;
+  background-color: #020e14;
+  text-align: center;
+  margin: 128px auto;
+  border: 1px solid #ffc451;
+  border-radius: 10px;
+  padding-bottom: 32px;
+  box-shadow: 1px 1px 4px #3d3d3d63;
+
+}
+
+h1 {
+  margin: 32px 0;
+  color: #fff;
+  font-size: 24px;
+}
+
+
+
+.todo-form {
+  margin-bottom: 32px;
+}
+
+.todo-input {
+  padding: 14px 32px 14px 16px;
+  border-radius: 4px 0 0 4px;
+  border: 2px solid #ffc451;
+  outline: none;
+  width: 320px;
+  background: transparent;
+  color: #fff;
+}
+
+.todo-input::placeholder {
+  color: #e2e2e285;
+}
+
+.todo-button {
+  padding: 16px;
+  border: none;
+  border-radius: 4px;
+  margin-right: 2px;
+  cursor: pointer;
+  outline: none;
+  background-color: #ffc451;
+  color: #020e14;
+  font-weight: bold;
+}
+
+.todo-input.edit {
+  border: 2px solid #ffc451;
+
+}
+
+.todo-button.edit {
+  background-color: #ffc451;
+
+  padding: 16px 22px;
+}
+
+.todo-container {
+  display: flex;
+  flex-direction: row;
+  position: relative;
+}
+
+.todo-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 4px auto;
+  color: #fff;
+  background-color: #ffc451;
+  color: #020e14;
+  padding: 16px;
+  border-radius: 5px;
+  width: 80%;
+}
+
+.complete {
+  text-decoration: line-through;
+  opacity: 0.4;
+}
+
+.icons {
+  display: flex;
+  align-items: center;
+  font-size: 24px;
+  cursor: pointer;
+}
+.complete-icon {
+  margin-right: 5px;
+  color: #020e14;
+}
+.delete-icon {
+  color: #020e14;
+}
+
+.edit-icon {
+  color: #020e14;
+}
