@@ -1,53 +1,30 @@
 import React, { useState } from "react";
+import { useCtrlZ } from "./hooks/useCtrlZ";
+import { useUndo } from "./hooks/useUndo";
 import Todo from "./todo";
 import TodoForm from "./todo-form";
 
 function TodoList() {
-  const [todos, setTodos] = useState([]);
 
-  const addTodo = (todo) => {
-    const newTodos = [todo, ...todos];
-    setTodos(newTodos);
-  };
+  const { todos, add, deleteTodo, undo, redo } = useUndo()
 
-  const handleDelete = (id) => {
-    const newTodos = todos.filter((todo) => todo.id !== id);
-    setTodos(newTodos);
-  };
+  useCtrlZ({ onCtrlZ: undo })
 
-  const handleEdit = (id, value) => {
-    setTodos((todos) => todos.map((todo) => (todo.id === id ? value : todo)));
-  };
-
-  const handeleComplete = (id) => {
-    const updateTodos = todos.map((todo) => {
-      if (todo.id === id) {
-        todo.isCompleted = !todo.isCompleted;
-      }
-      return todo;
-    });
-    setTodos(updateTodos);
-  };
-  const handleClear = () => {
-    setTodos([]);
-  };
+  console.log("todos", todos)
 
   return (
     <div className="todo-app">
       <h1>To Do</h1>
-      <TodoForm onSubmit={addTodo} />
+      <TodoForm onSubmit={add} />
       <Todo
         todos={todos}
-        onDelete={handleDelete}
-        onUpdate={handleEdit}
-        onCompleted={handeleComplete}
-        onClear={handleClear}
+        onDelete={deleteTodo}
       />
-      <button
-        className={todos.length > 0 ? "todo-clear" : "disabled"}
-        onClick={handleClear}
-      >
-        پاک کردن
+      <button onClick={undo} className="undo-button">
+        undo
+      </button>
+      <button onClick={redo} className="undo-button" >
+        redo
       </button>
     </div>
   );

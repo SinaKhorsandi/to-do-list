@@ -28,7 +28,7 @@ function Todo({ todos, onDelete, onUpdate, onCompleted }) {
         key={todo.id}
         className={todo.isCompleted ? "todo-row complete" : "todo-row "}
       >
-        {todo.value}
+        {todo.text}
         <div className="icons">
           <RiCheckLine
             className="complete-icon"
