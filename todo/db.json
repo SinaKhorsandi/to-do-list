@@ -7,31 +7,17 @@
     }
   ],
   "update": [],
-  "events": [],
-  "undos": [
+  "events": [
     {
-      "eventID": 4,
-      "type": "delete",
+      "type": "add",
       "title": "first",
       "id": 1
     },
     {
-      "eventID": 3,
-      "type": "add",
-      "title": "thrid",
-      "id": 2
-    },
-    {
-      "eventID": 2,
-      "type": "add",
-      "title": "second",
-      "id": 3
-    },
-    {
-      "eventID": 1,
-      "type": "add",
+      "type": "delete",
       "title": "first",
-      "id": 4
+      "id": 2
     }
-  ]
+  ],
+  "undos": []
 }

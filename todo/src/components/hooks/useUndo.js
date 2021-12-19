@@ -8,8 +8,6 @@ export function useUndo() {
   const [undos, setUndos] = useState([]);
   const { data, mutate } = useSWR("/posts", fetcher);
 
-
-  
   async function add(title) {
     const response = await fetch("http://localhost:4000/posts", {
       method: "POST",
@@ -35,8 +33,6 @@ export function useUndo() {
     });
     await events.json();
   }
-
-
 
   async function deleteTodo(id) {
     const todoIndex = data.findIndex((todo) => todo.id === id);
@@ -75,8 +71,6 @@ export function useUndo() {
       },
     });
   }
-
-
 
   async function updateTodo(id, title) {
     const todoIndex = data.findIndex((todo) => todo.id === id);
@@ -119,8 +113,6 @@ export function useUndo() {
     });
     await events.json();
   }
-
-
 
   async function undo() {
     const getEvents = await fetch("http://localhost:4000/events", {
@@ -195,20 +187,65 @@ export function useUndo() {
     }
   }
 
+  async function redo() {
+    const getUndos = await fetch("http://localhost:4000/undos", {
+      method: "GET",
+      headers: {
+        "Content-type": "application/json; charset=UTF-8",
+      },
+    });
+    const undoBody = await getUndos.json();
 
+    if (undoBody.length === 0) return;
 
-  const redo = () => {
-    if (undos.length === 0) return;
-    const nUndo = undos.pop();
-    if (nUndo.type === "add") {
-      setTodos([...todos, { ...nUndo.values }]);
-      setEvents([...events, { ...nUndo }]);
-    } else if (nUndo.type === "delete") {
-      const todoIndex = todos.findIndex((todo) => todo.id === undos.values.id);
-      const newTodos = [...todos];
-      newTodos.splice(todoIndex, 1);
-      setTodos(newTodos);
+    const lastUndo = undoBody[undoBody.length - 1];
+    console.log("lastUndo.id", lastUndo.id);
+
+    await fetch("http://localhost:4000/undos/" + lastUndo.id, {
+      method: "DELETE",
+      headers: {
+        "Content-type": "application/json; charset=UTF-8",
+      },
+    });
+
+    const events = await fetch("http://localhost:4000/events", {
+      method: "POST",
+      body: JSON.stringify({
+        // eventID: event.id,
+        type: lastUndo.type,
+        title: lastUndo.title,
+      }),
+      headers: {
+        "Content-type": "application/json; charset=UTF-8",
+      },
+    });
+    await events.json();
+
+    if (lastUndo.type === "add") {
+      const response = await fetch("http://localhost:4000/posts", {
+        method: "POST",
+        body: JSON.stringify({
+          title: lastUndo.title,
+        }),
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+        },
+      });
+      const body = await response.json();
+      mutate([...data, body], false);
+    } else if (lastUndo.type === "delete") {
+      const response = await fetch(
+        "http://localhost:4000/posts/" + lastUndo.id,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-type": "application/json; charset=UTF-8",
+          },
+        }
+      );
+      const body = await response.json();
+      mutate([...data, body], true);
     }
-  };
+  }
   return { add, deleteTodo, undo, redo, updateTodo };
 }
