@@ -24,6 +24,8 @@ const deleteTodo = (id) => {
   events.push({ type: "delete", values: { id, text: todo.text } });
 };
 
+
+
 const undo = () => {
   if (events.length === 0) return;
   const event = events.pop();

@@ -137,7 +137,7 @@ h1 {
   color: #ffc451;
 }
 .undo-button{
-  margin: 10px auto;
+  margin: 10px ;
   background-color: #020e14;
   color: #ffc451;
   text-align: center;
@@ -146,6 +146,19 @@ h1 {
   border: 1px solid #ffc451;
   border-radius: 5px;
   width: 10%;
+}
+.redo-button{
+
+  margin: 10px ;
+  background-color: #020e14;
+  color: #ffc451;
+  text-align: center;
+  font-weight: bold;
+  padding: 10px;
+  border: 1px solid #ffc451;
+  border-radius: 5px;
+  width: 10%;
+
 }
 .disabled {
   display: none;
