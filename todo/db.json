@@ -1,6 +1,37 @@
 {
   "posts": [],
-  "delete": [],
+  "delete": [
+    {
+      "title": "first",
+      "id": 1
+    }
+  ],
   "update": [],
-  "events": []
+  "events": [],
+  "undos": [
+    {
+      "eventID": 4,
+      "type": "delete",
+      "title": "first",
+      "id": 1
+    },
+    {
+      "eventID": 3,
+      "type": "add",
+      "title": "thrid",
+      "id": 2
+    },
+    {
+      "eventID": 2,
+      "type": "add",
+      "title": "second",
+      "id": 3
+    },
+    {
+      "eventID": 1,
+      "type": "add",
+      "title": "first",
+      "id": 4
+    }
+  ]
 }

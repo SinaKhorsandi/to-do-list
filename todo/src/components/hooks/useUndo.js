@@ -2,23 +2,19 @@ import { useState } from "react";
 import useSWR from "swr";
 import { fetcher } from "../../fetcher";
 
-let _id = 1;
-function gid() {
-  return _id++;
-}
-
 export function useUndo() {
   const [todos, setTodos] = useState([]);
   const [events, setEvents] = useState([]);
   const [undos, setUndos] = useState([]);
   const { data, mutate } = useSWR("/posts", fetcher);
 
-  async function add(text) {
-    const id = gid();
+
+  
+  async function add(title) {
     const response = await fetch("http://localhost:4000/posts", {
       method: "POST",
       body: JSON.stringify({
-        title: text,
+        title: title,
       }),
       headers: {
         "Content-type": "application/json; charset=UTF-8",
@@ -27,16 +23,20 @@ export function useUndo() {
     const body = await response.json();
     mutate([...data, body], false);
 
-    events.push({
-      type: "add",
-      values: {
-        id,
-        text,
+    const events = await fetch("http://localhost:4000/events", {
+      method: "POST",
+      body: JSON.stringify({
+        type: "add",
+        title: title,
+      }),
+      headers: {
+        "Content-type": "application/json; charset=UTF-8",
       },
     });
-    setEvents(events);
-    return id;
+    await events.json();
   }
+
+
 
   async function deleteTodo(id) {
     const todoIndex = data.findIndex((todo) => todo.id === id);
@@ -45,9 +45,17 @@ export function useUndo() {
     }
     const todo = data[todoIndex];
 
-    events.push({ type: "delete", values: { id, title: todo.title } });
-    setEvents(events);
-
+    const events = await fetch("http://localhost:4000/events", {
+      method: "POST",
+      body: JSON.stringify({
+        type: "delete",
+        title: todo.title,
+      }),
+      headers: {
+        "Content-type": "application/json; charset=UTF-8",
+      },
+    });
+    await events.json();
     const del = await fetch("http://localhost:4000/posts/" + id, {
       method: "DELETE",
       headers: {
@@ -67,6 +75,8 @@ export function useUndo() {
       },
     });
   }
+
+
 
   async function updateTodo(id, title) {
     const todoIndex = data.findIndex((todo) => todo.id === id);
@@ -97,17 +107,52 @@ export function useUndo() {
         "Content-type": "application/json; charset=UTF-8",
       },
     });
-    events.push({ type: "update", values: { id, title } });
-    setEvents(events);
+    const events = await fetch("http://localhost:4000/events", {
+      method: "POST",
+      body: JSON.stringify({
+        type: "update",
+        title: title,
+      }),
+      headers: {
+        "Content-type": "application/json; charset=UTF-8",
+      },
+    });
+    await events.json();
   }
 
+
+
   async function undo() {
-    if (events.length === 0) return;
-    const newEvents = [...events];
-    const event = newEvents.pop();
-    const newUndos = [...undos, event];
-    setUndos(newUndos);
-    setEvents(newEvents);
+    const getEvents = await fetch("http://localhost:4000/events", {
+      method: "GET",
+      headers: {
+        "Content-type": "application/json; charset=UTF-8",
+      },
+    });
+    const eventsBody = await getEvents.json();
+    if (eventsBody.length === 0) return;
+
+    const event = eventsBody[eventsBody.length - 1];
+
+    await fetch("http://localhost:4000/events/" + event.id, {
+      method: "DELETE",
+      headers: {
+        "Content-type": "application/json; charset=UTF-8",
+      },
+    });
+
+    const undos = await fetch("http://localhost:4000/undos", {
+      method: "POST",
+      body: JSON.stringify({
+        eventID: event.id,
+        type: event.type,
+        title: event.title,
+      }),
+      headers: {
+        "Content-type": "application/json; charset=UTF-8",
+      },
+    });
+    await undos.json();
 
     if (event.type === "delete") {
       const getUndo = await fetch("http://localhost:4000/delete", {
@@ -149,6 +194,8 @@ export function useUndo() {
       mutate([...data, undoBody], true);
     }
   }
+
+
 
   const redo = () => {
     if (undos.length === 0) return;
