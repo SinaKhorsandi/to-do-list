@@ -1,23 +1,7 @@
 {
   "posts": [],
-  "delete": [
-    {
-      "title": "first",
-      "id": 1
-    }
-  ],
+  "delete": [],
   "update": [],
-  "events": [
-    {
-      "type": "add",
-      "title": "first",
-      "id": 1
-    },
-    {
-      "type": "delete",
-      "title": "first",
-      "id": 2
-    }
-  ],
+  "events": [],
   "undos": []
 }

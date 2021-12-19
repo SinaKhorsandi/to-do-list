@@ -1,13 +1,10 @@
-import { useState } from "react";
 import useSWR from "swr";
 import { fetcher } from "../../fetcher";
 
 export function useUndo() {
-  const [todos, setTodos] = useState([]);
-  const [events, setEvents] = useState([]);
-  const [undos, setUndos] = useState([]);
   const { data, mutate } = useSWR("/posts", fetcher);
 
+  // add: Add To ToDo List
   async function add(title) {
     const response = await fetch("http://localhost:4000/posts", {
       method: "POST",
@@ -34,6 +31,7 @@ export function useUndo() {
     await events.json();
   }
 
+  // deleteTodo: delete From ToDo List
   async function deleteTodo(id) {
     const todoIndex = data.findIndex((todo) => todo.id === id);
     if (todoIndex === -1) {
@@ -72,6 +70,7 @@ export function useUndo() {
     });
   }
 
+  // updateTodo: Update ToDo List
   async function updateTodo(id, title) {
     const todoIndex = data.findIndex((todo) => todo.id === id);
     if (todoIndex === -1) {
@@ -114,6 +113,7 @@ export function useUndo() {
     await events.json();
   }
 
+  // undo: Undo function
   async function undo() {
     const getEvents = await fetch("http://localhost:4000/events", {
       method: "GET",
@@ -136,7 +136,6 @@ export function useUndo() {
     const undos = await fetch("http://localhost:4000/undos", {
       method: "POST",
       body: JSON.stringify({
-        eventID: event.id,
         type: event.type,
         title: event.title,
       }),
@@ -184,9 +183,39 @@ export function useUndo() {
       );
       const undoBody = await undo.json();
       mutate([...data, undoBody], true);
+    } else if (event.type === "update") {
+      const getUpdate = await fetch("http://localhost:4000/update", {
+        method: "GET",
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+        },
+      });
+      const getUpdateBody = await getUpdate.json();
+      const getPosts = await fetch("http://localhost:4000/posts", {
+        method: "GET",
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+        },
+      });
+      const getPostsBody = await getPosts.json();
+
+      const lastUpdate = getUpdateBody[getUpdateBody.length - 1];
+      const lastPost = getPostsBody[getPostsBody.length - 1];
+      const undo = await fetch("http://localhost:4000/posts/" + lastPost.id, {
+        method: "PUT",
+        body: JSON.stringify({
+          title: lastUpdate.pastTitle,
+        }),
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+        },
+      });
+      const undoBody = await undo.json();
+      mutate([...data, undoBody], true);
     }
   }
 
+  // redo: redo function
   async function redo() {
     const getUndos = await fetch("http://localhost:4000/undos", {
       method: "GET",
@@ -211,7 +240,6 @@ export function useUndo() {
     const events = await fetch("http://localhost:4000/events", {
       method: "POST",
       body: JSON.stringify({
-        // eventID: event.id,
         type: lastUndo.type,
         title: lastUndo.title,
       }),
@@ -245,6 +273,35 @@ export function useUndo() {
       );
       const body = await response.json();
       mutate([...data, body], true);
+    } else if (lastUndo.type === "update") {
+      const getUpdate = await fetch("http://localhost:4000/update", {
+        method: "GET",
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+        },
+      });
+      const getUpdateBody = await getUpdate.json();
+      const getPosts = await fetch("http://localhost:4000/posts", {
+        method: "GET",
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+        },
+      });
+      const getPostsBody = await getPosts.json();
+
+      const lastUpdate = getUpdateBody[getUpdateBody.length - 1];
+      const lastPost = getPostsBody[getPostsBody.length - 1];
+      const undo = await fetch("http://localhost:4000/posts/" + lastPost.id, {
+        method: "PUT",
+        body: JSON.stringify({
+          title: lastUpdate.newTitle,
+        }),
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+        },
+      });
+      const undoBody = await undo.json();
+      mutate([...data, undoBody], true);
     }
   }
   return { add, deleteTodo, undo, redo, updateTodo };
